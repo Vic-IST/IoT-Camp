@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LED Controller</title>
+
+  <!--
+  =============================================================================
+  CAMPER CUSTOMIZATION GUIDE
+  =============================================================================
+
+  This page controls the WS2812B LED strip through the Raspberry Pi.
+  When you click a button, the browser sends a request to Flask (app.py),
+  which publishes an MQTT message to the ESP32, which changes the LEDs.
+
+  THINGS YOU CAN CUSTOMIZE:
+    1. Page title and heading text
+    2. Button colors and labels
+    3. Background and card colors (look for CSS variables at the top of <style>)
+    4. Add a new color button (copy an existing one and change the color name)
+    5. STRETCH: Add an RGB color picker (see bottom of this file)
+
+  =============================================================================
+  -->
+
+  <style>
+    /* =========================================================================
+       CSS VARIABLES -- change these to retheme the whole page at once!
+       ========================================================================= */
+    :root {
+      --bg-color:      #0f0f1a;   /* page background */
+      --card-color:    #1e1e2e;   /* button card background */
+      --text-color:    #e0e0f0;   /* main text */
+      --accent-color:  #7c6af7;   /* heading accent / borders */
+      --status-color:  #a0a0b0;   /* status message text */
+      --border-radius: 14px;
+    }
+
+    /* =========================================================================
+       GENERAL LAYOUT
+       ========================================================================= */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    /* =========================================================================
+       HEADER
+       CAMPERS: Change the text inside <h1> and <p> in the HTML below.
+       ========================================================================= */
+    header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      color: var(--accent-color);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    header p {
+      margin-top: 8px;
+      color: var(--status-color);
+      font-size: 0.95rem;
+    }
+
+    /* =========================================================================
+       BUTTON GRID
+       ========================================================================= */
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 18px;
+      width: 100%;
+      max-width: 700px;
+    }
+
+    /* Each color button card */
+    .color-btn {
+      background-color: var(--card-color);
+      border: 2px solid transparent;
+      border-radius: var(--border-radius);
+      padding: 28px 16px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-color);
+      font-family: inherit;
+    }
+
+    .color-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+
+    .color-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* The colored circle on each button */
+    .color-swatch {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.15);
+    }
+
+    /* When a button is "active" (last one clicked), highlight its border */
+    .color-btn.active {
+      border-color: white;
+      box-shadow: 0 0 18px rgba(255,255,255,0.2);
+    }
+
+    /*
+    =========================================================================
+    INDIVIDUAL BUTTON SWATCH COLORS
+    CAMPERS: Change the background-color to add new colors!
+    You can use color names like "orange", or hex codes like "#ff8800".
+    ========================================================================= */
+    #btn-red   .color-swatch { background-color: #ff3b3b; }
+    #btn-green .color-swatch { background-color: #2ecc71; }
+    #btn-blue  .color-swatch { background-color: #3b82f6; }
+    #btn-white .color-swatch { background-color: #ffffff; }
+    #btn-off   .color-swatch { background-color: #333344; border-color: #555566; }
+
+    /* =========================================================================
+       STATUS BAR
+       ========================================================================= */
+    #status {
+      margin-top: 32px;
+      font-size: 0.9rem;
+      color: var(--status-color);
+      min-height: 1.4em;
+      text-align: center;
+      transition: color 0.3s;
+    }
+
+    #status.success { color: #2ecc71; }
+    #status.error   { color: #ff5555; }
+
+    /* =========================================================================
+       STRETCH GOAL: RGB PICKER SECTION
+       (hidden by default — remove the "display:none" to show it)
+       ========================================================================= */
+    .rgb-section {
+      display: none;   /* CAMPERS: change this to "display: block" to enable */
+      margin-top: 36px;
+      background-color: var(--card-color);
+      border-radius: var(--border-radius);
+      padding: 24px;
+      width: 100%;
+      max-width: 700px;
+    }
+
+    .rgb-section h2 {
+      font-size: 1rem;
+      margin-bottom: 16px;
+      color: var(--accent-color);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .rgb-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .rgb-row label {
+      width: 20px;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+
+    .rgb-row input[type="range"] {
+      flex: 1;
+      accent-color: var(--accent-color);
+    }
+
+    .rgb-row span {
+      width: 30px;
+      text-align: right;
+      font-size: 0.85rem;
+      color: var(--status-color);
+    }
+
+    #rgb-preview {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.2);
+      margin: 12px auto;
+    }
+
+    .send-btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity 0.15s;
+    }
+
+    .send-btn:hover { opacity: 0.85; }
+
+    /* =========================================================================
+       FOOTER
+       ========================================================================= */
+    footer {
+      margin-top: 48px;
+      font-size: 0.8rem;
+      color: #555566;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================================================================
+       HEADER
+       CAMPERS: Edit the heading and subtitle text here!
+       ========================================================================= -->
+  <header>
+    <h1>LED Controller</h1>
+    <p>Click a button to change your LED strip color</p>
+  </header>
+
+
+  <!-- =========================================================================
+       COLOR BUTTONS
+       CAMPERS: To add a new color:
+         1. Copy one of the <button> blocks below.
+         2. Change the id (e.g. id="btn-orange").
+         3. Change the data-color to the color name (e.g. data-color="orange").
+         4. Change the label text.
+         5. Add a matching CSS rule above: #btn-orange .color-swatch { background-color: orange; }
+         6. Add "orange" to ALLOWED_COLORS in app.py and handle it in main.py's on_msg().
+       ========================================================================= -->
+  <div class="button-grid">
+
+    <button class="color-btn" id="btn-red" data-color="red">
+      <div class="color-swatch"></div>
+      Red
+    </button>
+
+    <button class="color-btn" id="btn-green" data-color="green">
+      <div class="color-swatch"></div>
+      Green
+    </button>
+
+    <button class="color-btn" id="btn-blue" data-color="blue">
+      <div class="color-swatch"></div>
+      Blue
+    </button>
+
+    <button class="color-btn" id="btn-white" data-color="white">
+      <div class="color-swatch"></div>
+      White
+    </button>
+
+    <button class="color-btn" id="btn-off" data-color="off">
+      <div class="color-swatch"></div>
+      Off
+    </button>
+
+    <!--
+    CAMPERS: Copy and paste a new button block here.
+    Example for orange:
+
+    <button class="color-btn" id="btn-orange" data-color="orange">
+      <div class="color-swatch"></div>
+      Orange
+    </button>
+
+    Then add in the CSS section above:
+    #btn-orange .color-swatch { background-color: orange; }
+    -->
+
+  </div>
+
+
+  <!-- Status message shown after each button press -->
+  <div id="status">Ready</div>
+
+
+  <!-- =========================================================================
+       STRETCH GOAL: RGB COLOR PICKER
+       This section is hidden. Change display:none to display:block in the CSS
+       to enable it. It sends a custom RGB value to the /custom Flask route.
+       ========================================================================= -->
+  <div class="rgb-section">
+    <h2>Custom Color (Stretch Goal)</h2>
+
+    <div class="rgb-row">
+      <label>R</label>
+      <input type="range" id="r-slider" min="0" max="255" value="255">
+      <span id="r-val">255</span>
+    </div>
+
+    <div class="rgb-row">
+      <label>G</label>
+      <input type="range" id="g-slider" min="0" max="255" value="0">
+      <span id="g-val">0</span>
+    </div>
+
+    <div class="rgb-row">
+      <label>B</label>
+      <input type="range" id="b-slider" min="0" max="255" value="0">
+      <span id="b-val">0</span>
+    </div>
+
+    <div id="rgb-preview"></div>
+
+    <button class="send-btn" id="send-rgb">Send Custom Color</button>
+  </div>
+
+
+  <!-- =========================================================================
+       FOOTER
+       CAMPERS: Put your name here!
+       ========================================================================= -->
+  <footer>
+    Built at IoT Camp &mdash; Your Name Here
+  </footer>
+
+
+  <!-- =========================================================================
+       JAVASCRIPT
+       This is what makes the buttons actually do something.
+       When you click a button, it sends a "fetch" request to Flask,
+       which then publishes the MQTT message to the ESP32.
+
+       You don't need to change this section to complete the basic customizations.
+       ========================================================================= -->
+  <script>
+
+    // ---- Helper: show a status message below the buttons ----
+    function setStatus(message, type) {
+      const el = document.getElementById("status");
+      el.textContent = message;
+      el.className = type || "";
+    }
+
+    // ---- Color buttons ----
+    // Select all elements that have the class "color-btn"
+    const colorButtons = document.querySelectorAll(".color-btn");
+
+    colorButtons.forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        const color = btn.getAttribute("data-color");  // e.g. "red"
+
+        setStatus("Sending: " + color + "...");
+
+        // Remove the "active" highlight from all buttons
+        colorButtons.forEach(function(b) { b.classList.remove("active"); });
+
+        // Send a GET request to Flask: /color/red, /color/blue, etc.
+        fetch("/color/" + color)
+          .then(function(response) { return response.json(); })
+          .then(function(data) {
+            if (data.status === "ok") {
+              btn.classList.add("active");  // highlight the clicked button
+              setStatus("LEDs set to: " + color, "success");
+            } else {
+              setStatus("Error: " + data.message, "error");
+            }
+          })
+          .catch(function(err) {
+            setStatus("Connection error — is app.py running?", "error");
+          });
+      });
+    });
+
+
+    // ---- RGB Sliders (Stretch Goal) ----
+    const rSlider = document.getElementById("r-slider");
+    const gSlider = document.getElementById("g-slider");
+    const bSlider = document.getElementById("b-slider");
+    const preview = document.getElementById("rgb-preview");
+
+    function updatePreview() {
+      const r = rSlider.value;
+      const g = gSlider.value;
+      const b = bSlider.value;
+      document.getElementById("r-val").textContent = r;
+      document.getElementById("g-val").textContent = g;
+      document.getElementById("b-val").textContent = b;
+      preview.style.backgroundColor = "rgb(" + r + "," + g + "," + b + ")";
+    }
+
+    rSlider.addEventListener("input", updatePreview);
+    gSlider.addEventListener("input", updatePreview);
+    bSlider.addEventListener("input", updatePreview);
+    updatePreview(); // initialize on load
+
+    document.getElementById("send-rgb").addEventListener("click", function() {
+      const payload = {
+        r: parseInt(rSlider.value),
+        g: parseInt(gSlider.value),
+        b: parseInt(bSlider.value)
+      };
+
+      setStatus("Sending custom color...");
+
+      // Send a POST request with the RGB values as JSON
+      fetch("/custom", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.status === "ok") {
+            colorButtons.forEach(function(b) { b.classList.remove("active"); });
+            setStatus("Custom color sent!", "success");
+          } else {
+            setStatus("Error: " + data.message, "error");
+          }
+        })
+        .catch(function() {
+          setStatus("Connection error — is app.py running?", "error");
+        });
+    });
+
+  </script>
+
+</body>
+</html>
