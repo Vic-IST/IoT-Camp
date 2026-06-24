@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IoT & AI Camp 2026 — Camper Files</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0a1a2e;
+      color: #1a202c;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    body::before {
+      content: '';
+      display: block;
+      height: 6px;
+      background: linear-gradient(90deg, #041E41 60%, #FFB819 100%);
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #FFB819;
+    }
+
+    header p {
+      margin-top: 0.5rem;
+      color: #8aa8c8;
+      font-size: 1rem;
+    }
+
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .section {
+      background: #112240;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+
+    .section-header {
+      background: #041E41;
+      color: #FFB819;
+      padding: 0.75rem 1.25rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .file-list {
+      list-style: none;
+    }
+
+    .file-list li {
+      border-bottom: 1px solid #1e3a5f;
+    }
+
+    .file-list li:last-child {
+      border-bottom: none;
+    }
+
+    .file-list a {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.9rem 1.25rem;
+      text-decoration: none;
+      color: #cdd9e8;
+      font-size: 0.97rem;
+      transition: background 0.15s;
+    }
+
+    .file-list a:hover {
+      background: #1e3a5f;
+      color: #FFB819;
+    }
+
+    .icon {
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .label {
+      flex: 1;
+    }
+
+    .badge {
+      font-size: 0.72rem;
+      font-weight: 600;
+      background: #e2e8f0;
+      color: #4a5568;
+      border-radius: 4px;
+      padding: 0.15rem 0.45rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge.pdf  { background: #fed7d7; color: #9b2c2c; }
+    .badge.docx { background: #bee3f8; color: #2c5282; }
+    .badge.py   { background: #c6f6d5; color: #22543d; }
+    .badge.md   { background: #fefcbf; color: #744210; }
+
+    .day-label {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border-radius: 20px;
+      padding: 0.2rem 0.7rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .day-label.done {
+      background: #e2e8f0;
+      color: #718096;
+    }
+
+    .day-label.today {
+      background: #c6f6d5;
+      color: #22543d;
+    }
+
+    .day-group {
+      margin-bottom: 0.5rem;
+    }
+
+    .day-group-header {
+      padding: 0.6rem 1.25rem 0;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #718096;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .day-group-header.today-group {
+      color: #276749;
+    }
+
+    .section-header.day3 { border-left: 5px solid #FFB819; }
+
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: #4a6fa5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>⚡ IoT & AI Camp 2026</h1>
+      <p>Click any file below to open or download it.</p>
+    </header>
+
+    <!-- Day 1 -->
+    <div class="section">
+      <div class="section-header day1">✅ Day 1 — Getting Started <span style="font-weight:400;font-size:0.8em;opacity:0.85;">(complete)</span></div>
+      <ul class="file-list">
+        <li>
+          <a href="Day1_Camper_Info_Sheet.docx" download>
+            <span class="icon">📄</span>
+            <span class="label">Day 1 Camper Info Sheet</span>
+            <span class="badge docx">DOCX</span>
+          </a>
+        </li>
+        <li>
+          <a href="Day1_Setup_and_Prepare.docx" download>
+            <span class="icon">🛠️</span>
+            <span class="label">Day 1 Setup & Prepare</span>
+            <span class="badge docx">DOCX</span>
+          </a>
+        </li>
+        <li>
+          <a href="Google_Account_Setup_Guide.md" download>
+            <span class="icon">🔑</span>
+            <span class="label">Google Account Setup Guide</span>
+            <span class="badge md">MD</span>
+          </a>
+        </li>
+        <li>
+          <a href="SSH_Instructions_Mac.md" download>
+            <span class="icon">🖥️</span>
+            <span class="label">SSH Instructions (Mac)</span>
+            <span class="badge md">MD</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Day 2 -->
+    <div class="section">
+      <div class="section-header day2">✅ Day 2 — MQTT & Messaging <span style="font-weight:400;font-size:0.8em;opacity:0.85;">(complete)</span></div>
+      <ul class="file-list">
+        <li>
+          <a href="MQTT_Student_Reference_Card.pdf" target="_blank">
+            <span class="icon">📋</span>
+            <span class="label">MQTT Student Reference Card</span>
+            <span class="badge pdf">PDF</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Day 3 -->
+    <div class="section">
+      <div class="section-header day3">📍 Day 3 — Flask & HTML (Today)</div>
+      <ul class="file-list">
+        <li>
+          <a href="Flask_HTML_Day_Instructions.pdf" target="_blank">
+            <span class="icon">📋</span>
+            <span class="label">Flask & HTML Day Instructions</span>
+            <span class="badge pdf">PDF</span>
+          </a>
+        </li>
+        <li>
+          <a href="app.py" download>
+            <span class="icon">🐍</span>
+            <span class="label">app.py</span>
+            <span class="badge py">PY</span>
+          </a>
+        </li>
+        <li>
+          <a href="main.py" download>
+            <span class="icon">🐍</span>
+            <span class="label">main.py</span>
+            <span class="badge py">PY</span>
+          </a>
+        </li>
+        <li>
+          <a href="templates/index.html" download>
+            <span class="icon">🌐</span>
+            <span class="label">templates/index.html</span>
+            <span class="badge md">HTML</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <footer>IoT & AI Camp 2026 &mdash; Mississippi Gulf Coast Community College</footer>
+  </div>
+</body>
+</html>
